@@ -14,9 +14,10 @@ tf.flags.DEFINE_string("pos_dir", "data/rt-polaritydata/rt-polarity.pos", "Path 
 tf.flags.DEFINE_string("neg_dir", "data/rt-polaritydata/rt-polarity.neg", "Path of negative data")
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
 tf.flags.DEFINE_integer("max_sentence_length", 50, "Max sentence length in train/test data (Default: 50)")
+tf.flags.DEFINE_integer("min_frequency", 50, "Min word frequency to be contained in vocab list")
 
 # Model Hyperparameters
-tf.flags.DEFINE_string("cell_type", "vanilla", "Type of RNN cell. Choose 'vanilla' or 'lstm' or 'gru' (Default: vanilla)")
+tf.flags.DEFINE_string("cell_type", "lstm", "Type of RNN cell. Choose 'vanilla' or 'lstm' or 'gru' (Default: vanilla)")
 tf.flags.DEFINE_string("word2vec", None, "Word2vec file with pre-trained embeddings")
 tf.flags.DEFINE_integer("word_embedding_dim", 300, "Dimensionality of word embedding (Default: 300)")
 tf.flags.DEFINE_integer("context_embedding_dim", 512, "Dimensionality of context embedding(= RNN state size)  (Default: 512)")
@@ -50,7 +51,7 @@ def train():
     with tf.device('/cpu:0'):
         x_text, y = data_helpers.load_data_and_labels(FLAGS.pos_dir, FLAGS.neg_dir)
 
-    text_vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(FLAGS.max_sentence_length)
+    text_vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(FLAGS.max_sentence_length, min_frequency=FLAGS.min_frequency)
     x = np.array(list(text_vocab_processor.fit_transform(x_text)))
     print("Text Vocabulary Size: {:d}".format(len(text_vocab_processor.vocabulary_)))
 
